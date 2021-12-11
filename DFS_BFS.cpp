@@ -11,31 +11,34 @@ void main()
 		printf("2. 연결리스트 큐로 미로찾기\n");
 		printf("3. 연결리스트 큐로 미로찾기 게임하기\n");
 		printf("4. 연결리스트 스택, 큐로 비교하기\n");
-		printf("=================================\n");
-		printf("번호 입력, 번호 외 값 종료 : ");
+		printf("========그 외 번호는 종료==========\n");
+		printf("번호 입력: ");
 		scanf("%d", &num);
 
 		if (num == 1)
 		{
 			maze.roadMap("Maze.txt", num);
-			//system("cls");
-			printf("<Linked Stack Maze> Start!!\n-> Enter and Show Miro Program");
+			system("cls");
+			printf("<Linked Stack Maze> Start!!\n-> 동작을 위해 엔터를 누르세요!");
 			maze.stack_Search();
-			//maze.buffer_print();
+			maze.printDFS();
+			printf("\n");
 
 		}
 		else if (num == 2)
 		{
 			maze.roadMap("Maze.txt", num);
 			system("cls");
-			printf("<LinkedQueueMaze> Start!!\n-> Enter and Show Miro Program");
+			printf("<LinkedQueueMaze> Start!!\n-> 동작을 위해 엔터를 누르세요!");
 			maze.queue_SearchExit();
+			maze.printBFS();
+			printf("\n");
 		}
 		else if (num == 3)
 		{
 			maze.roadMap("Maze.txt", num);
 			system("cls");
-			printf("<LinkedQueueMaze> Start!!\n-> Enter and Show Miro Program");
+			printf("<LinkedQueueMaze> Start!!\n-> 동작을 위해 방향키를 누르세요!");
 			maze.printMap();
 			maze.QueueMazeGame();
 		}
