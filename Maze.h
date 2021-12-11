@@ -150,6 +150,51 @@ public:
 		return 0;
 	}
 
+	void printDFS()
+	{
+		roadMap("Maze.txt", 1);
+		printf("DFS~\n");
+		while (stack.isEmpty() == false) {
+			Location2D* here = stack.peek();
+			stack.pop();
+			int r = here->row;
+			int c = here->col;
+			printf("(%d,%d)-> ", r, c);
+			if (map[r][c] == 'x') {
+				return;
+			}
+			else {
+				map[r][c] = '.';
+				if (isValidLoc(r - 1, c)) stack.push(new Node(r - 1, c));
+				if (isValidLoc(r + 1, c)) stack.push(new Node(r + 1, c));
+				if (isValidLoc(r, c - 1)) stack.push(new Node(r, c - 1));
+				if (isValidLoc(r, c + 1)) stack.push(new Node(r, c + 1));
+			}
+		}
+	}
+	void printBFS()
+	{
+		roadMap("Maze.txt", 2);
+		printf("BFS~\n");
+		while (locQueue.isEmpty() == false) {
+			Location2D* here = locQueue.peek();
+			locQueue.dequeue();
+			int r = here->row;
+			int c = here->col;
+			printf("(%d,%d)-> ", r, c);
+			if (map[r][c] == 'x') {
+				return;
+			}
+			else {
+				map[r][c] = '.';
+				if (isValidLoc(r - 1, c)) locQueue.enqueue(new Node(r - 1, c));
+				if (isValidLoc(r + 1, c)) locQueue.enqueue(new Node(r + 1, c));
+				if (isValidLoc(r, c - 1)) locQueue.enqueue(new Node(r, c - 1));
+				if (isValidLoc(r, c + 1)) locQueue.enqueue(new Node(r, c + 1));
+			}
+		}
+	}
+	//==================위치출력================================
 	void queue_SearchExit()
 	{
 		int count = 0;
@@ -166,7 +211,7 @@ public:
 				int r = here->row;
 				int c = here->col;
 
-				printf("Now Position: (%d,%d) \n", r, c);
+				printf("현재위치: (%d,%d) \n", r, c);
 
 				if (map[r][c] == 'x') { //출구이면 성공
 					system("cls");
@@ -190,57 +235,26 @@ public:
 	}
 
 	
-	void buffer_print()
-	{
 
-		LinkedStack stack;
-		Location2D entry(1, 0);
-		stack.push(new Node(1, 0));
-
-
-
-		printf("DFS~\n");
-		while (stack.isEmpty() == false) {
-			Location2D* here = stack.peek();
-			stack.pop();
-
-
-
-			int r = here->row;
-			int c = here->col;
-			printf("(%d,%d)-> ", r, c);
-			if (map[r][c] == 'x') {
-				return;
-			}
-			else {
-				map[r][c] = '.';
-				if (isValidLoc(r - 1, c)) stack.push(new Node(r - 1, c));
-				if (isValidLoc(r + 1, c)) stack.push(new Node(r + 1, c));
-				if (isValidLoc(r, c - 1)) stack.push(new Node(r, c - 1));
-				if (isValidLoc(r, c + 1)) stack.push(new Node(r, c + 1));
-			}
-		}
-	}
 	
 	void stack_Search()	//스택 부분
 	{
 		int count=0;
 		while (stack.isEmpty() == false) {	//스택 비어있지 않을 경우
-			buffer_print();
 			printMap();
 			if (get_Enterkey() == 13) {
-				//system("cls");
+				system("cls");
 				Node* here = stack.peek();
 				stack.pop();
 
 				int r = here->row;
 				int c = here->col;
 				count++;
-				//printf("Now Position: (%d,%d) ", r, c);
+				printf("현재위치: (%d,%d) ", r, c);
 
 				if (map[r][c] == 'x')
 				{
-					//system("cls");
+					system("cls");
 					printf("\n!탐색 성공!\n");
 					printf("pop %d번 \n", count);
 					printf("=====[ Result ]=====\n");
@@ -261,7 +275,7 @@ public:
 	}
 
 
-	//______________________________________________________________________________________________________
+	//=================================================================
 
 
 	void QueueMazeGame()
