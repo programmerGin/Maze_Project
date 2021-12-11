@@ -4,7 +4,7 @@
 
 class Node : public Location2D
 {
-public:
+public: 
 	Node* link;
 
 	Node(int r = 0, int c = 0)

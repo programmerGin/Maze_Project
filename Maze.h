@@ -8,7 +8,7 @@
 using namespace std;
 
 class Maze
-{
+{ 
 	char** map = NULL;
 	int width;
 	int height;
@@ -188,6 +188,7 @@ public:
 
 	void stack_Search()	//스택 부분
 	{
+		int count=0;
 		while (stack.isEmpty() == false) {	//스택 비어있지 않을 경우
 			printMap();
 			if (get_Enterkey() == 13) {
@@ -197,12 +198,14 @@ public:
 
 				int r = here->row;
 				int c = here->col;
+				count++;
 				printf("Now Position: (%d,%d) ", r, c);
 
 				if (map[r][c] == 'x')
 				{
 					system("cls");
 					printf("\n!탐색 성공!\n");
+					printf("pop %d번 \n", count);
 					printf("=====[ Result ]=====\n");
 					printMap();
 					return;
@@ -501,8 +504,8 @@ public:
 		while (1)
 		{
 			comparePrintMap();
-			Sleep(300);
-			system("cls");
+			Sleep(100);
+			//system("cls");
 
 			if (locQueue.isEmpty() == true && stack.isEmpty() == true)
 			{
@@ -516,7 +519,7 @@ public:
 				else if (stackCount == queueCount)
 					printf("스택과 큐의 탐색 횟수가 동일합니다.\n");
 
-				comparePrintMap();
+				
 				return;
 			}
 
@@ -527,7 +530,7 @@ public:
 				int sr = hereStack->row;
 				int sc = hereStack->col;
 				stackCount++;
-				printf("Stack Now Position: (%d,%d) \n", sr, sc);
+				//printf("Stack Now Position: (%d,%d) \n", sr, sc);
 
 				if (stackMap[sr][sc] == 'x')
 				{
@@ -550,7 +553,7 @@ public:
 				int qr = hereQueue->row;
 				int qc = hereQueue->col;
 				queueCount++;
-				printf("Queue Now Position: (%d,%d) \n", qr, qc);
+				//printf("Queue Now Position: (%d,%d) \n", qr, qc);
 
 				if (queueMap[qr][qc] == 'x')
 				{

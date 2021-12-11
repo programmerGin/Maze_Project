@@ -1,6 +1,6 @@
 #pragma once
 #pragma
-struct Location2D {
+struct Location2D { 
 	//행 번호
 	int row;
 	//열 번호
