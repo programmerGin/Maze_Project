@@ -3,7 +3,7 @@
 
 class LinkedQueue {
 	Node* front;
-	Node* rear;
+	Node* rear; 
 
 public:
 
