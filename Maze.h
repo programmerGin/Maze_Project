@@ -5,6 +5,7 @@
 #include <fstream>
 #include <conio.h>
 #include <Windows.h>
+
 using namespace std;
 
 class Maze
@@ -45,6 +46,8 @@ public:
 		if (r < 0 || c < 0 || r >= height || c >= width) return false;
 		else return map[r][c] == '0' || map[r][c] == 'x';
 	}
+
+
 
 	void roadMap(const char* filename, int num)
 	{
@@ -186,27 +189,62 @@ public:
 		printf("미로 탐색 실패\n");
 	}
 
+	
+	void buffer_print()
+	{
+
+		LinkedStack stack;
+		Location2D entry(1, 0);
+		stack.push(new Node(1, 0));
+
+
+
+		printf("DFS~\n");
+		while (stack.isEmpty() == false) {
+			Location2D* here = stack.peek();
+			stack.pop();
+
+
+
+			int r = here->row;
+			int c = here->col;
+			printf("(%d,%d)-> ", r, c);
+			if (map[r][c] == 'x') {
+				return;
+			}
+			else {
+				map[r][c] = '.';
+				if (isValidLoc(r - 1, c)) stack.push(new Node(r - 1, c));
+				if (isValidLoc(r + 1, c)) stack.push(new Node(r + 1, c));
+				if (isValidLoc(r, c - 1)) stack.push(new Node(r, c - 1));
+				if (isValidLoc(r, c + 1)) stack.push(new Node(r, c + 1));
+			}
+		}
+	}
+	
 	void stack_Search()	//스택 부분
 	{
 		int count=0;
 		while (stack.isEmpty() == false) {	//스택 비어있지 않을 경우
+			buffer_print();
 			printMap();
 			if (get_Enterkey() == 13) {
-				system("cls");
+				//system("cls");
 				Node* here = stack.peek();
 				stack.pop();
 
 				int r = here->row;
 				int c = here->col;
 				count++;
-				printf("Now Position: (%d,%d) ", r, c);
+				//printf("Now Position: (%d,%d) ", r, c);
 
 				if (map[r][c] == 'x')
 				{
-					system("cls");
+					//system("cls");
 					printf("\n!탐색 성공!\n");
 					printf("pop %d번 \n", count);
 					printf("=====[ Result ]=====\n");
+					
 					printMap();
 					return;
 				}
@@ -530,6 +568,7 @@ public:
 				int sr = hereStack->row;
 				int sc = hereStack->col;
 				stackCount++;
+
 				//printf("Stack Now Position: (%d,%d) \n", sr, sc);
 
 				if (stackMap[sr][sc] == 'x')
@@ -569,6 +608,7 @@ public:
 					if (queue_isValidLoc(qr, qc + 1)) locQueue.enqueue(new Node(qr, qc + 1));
 				}
 			}
+		
 		}
 		printf("미로 탐색 실패\n");
 	}

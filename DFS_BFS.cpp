@@ -18,9 +18,11 @@ void main()
 		if (num == 1)
 		{
 			maze.roadMap("Maze.txt", num);
-			system("cls");
+			//system("cls");
 			printf("<Linked Stack Maze> Start!!\n-> Enter and Show Miro Program");
 			maze.stack_Search();
+			//maze.buffer_print();
+
 		}
 		else if (num == 2)
 		{
