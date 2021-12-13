@@ -1,9 +1,27 @@
 #include "MazeFunction.h"
+#include <stdio.h>
+#include <Windows.h>
+#include <conio.h>
+#include <mmsystem.h>
+#include <mciapi.h>
+#pragma comment(lib,"winmm.lib")
+
+	
+	
 void main()
 {
+	//PlaySound("파일경로", 0, SND_FILENAME | SND_ASYNC); //일반 재생
+	PlaySound(TEXT("bgm.wav"), 0, SND_FILENAME | SND_ASYNC | SND_LOOP); //루프 재생
+	_getch();
+
+
+
+
 	system("mode con cols=150 lines=40");
 	int num;
 	Maze maze;
+	
+
 
 	while (1) {
 		printf("=======   8조 미로찾기 프로젝트 ==========\n");

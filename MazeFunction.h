@@ -118,7 +118,7 @@ public:
 				}
 				else if (map[i][z] == 'e') //입구
 				{
-					cout << "☞ ";
+					cout << "☞";
 				}
 				else if (map[i][z] == 'x') //출구
 				{
