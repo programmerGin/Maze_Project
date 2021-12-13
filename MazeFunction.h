@@ -49,7 +49,7 @@ public:
 
 
 
-	void roadMap(const char* filename, int num)
+	void roadFile(const char* filename, int num)
 	{
 		char c;
 		ifstream fp(filename);
@@ -152,7 +152,7 @@ public:
 
 	void printDFS()
 	{
-		roadMap("Maze.txt", 1);
+		roadFile("Maze.txt", 1);
 		printf("DFS~\n");
 		while (stack.isEmpty() == false) {
 			Location2D* here = stack.peek();
@@ -174,7 +174,7 @@ public:
 	}
 	void printBFS()
 	{
-		roadMap("Maze.txt", 2);
+		roadFile("Maze.txt", 2);
 		printf("BFS~\n");
 		while (queue.isEmpty() == false) {
 			Location2D* here = queue.peek();
@@ -195,7 +195,7 @@ public:
 		}
 	}
 	//==================위치출력================================
-	void queue_SearchExit()//BFS
+	void queue_SearchExit()//BFS 너비우선탐색
 	{
 		int count = 0;
 		while (queue.isEmpty() == false) 
@@ -238,7 +238,7 @@ public:
 	
 
 	
-	void stack_Search()	//DFS
+	void stack_Search()	//DFS 깊이우선 탐색
 	{
 		int count=0;
 		while (stack.isEmpty() == false) {	
@@ -489,5 +489,13 @@ void compare()
 
 	}
 	printf("미로 탐색 실패\n");
+
+
+
+
 }
+
+
+
+
 };
