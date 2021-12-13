@@ -1,17 +1,16 @@
 #include "Maze.h"
 void main()
 {
-	system("mode con cols=120 lines=40");
+	system("mode con cols=150 lines=40");
 	int num;
 	Maze maze;
 
 	while (1) {
-		printf("=================================\n");
-		printf("1. 연결리스트 스택으로 미로찾기\n");
-		printf("2. 연결리스트 큐로 미로찾기\n");
-		printf("3. 연결리스트 큐로 미로찾기 게임하기\n");
-		printf("4. 연결리스트 스택, 큐로 비교하기\n");
-		printf("========그 외 번호는 종료==========\n");
+		printf("=======메뉴를 선택해주세요==========\n");
+		printf("1. DFS방식 미로찾기\n");
+		printf("2. BFS방식  미로찾기\n");
+		printf("3. DFS, BFS 비교하기\n");
+		printf("===========그외 번호는 종료=================\n");
 		printf("번호 입력: ");
 		scanf("%d", &num);
 
@@ -19,7 +18,7 @@ void main()
 		{
 			maze.roadMap("Maze.txt", num);
 			system("cls");
-			printf("<Linked Stack Maze> Start!!\n-> 동작을 위해 엔터를 누르세요!");
+			printf("동작을 위해 엔터를 누르세요!");
 			maze.stack_Search();
 			maze.printDFS();
 			printf("\n");
@@ -29,24 +28,15 @@ void main()
 		{
 			maze.roadMap("Maze.txt", num);
 			system("cls");
-			printf("<LinkedQueueMaze> Start!!\n-> 동작을 위해 엔터를 누르세요!");
+			printf("동작을 위해 엔터를 누르세요!");
 			maze.queue_SearchExit();
 			maze.printBFS();
 			printf("\n");
 		}
 		else if (num == 3)
 		{
-			maze.roadMap("Maze.txt", num);
-			system("cls");
-			printf("<LinkedQueueMaze> Start!!\n-> 동작을 위해 방향키를 누르세요!");
-			maze.printMap();
-			maze.QueueMazeGame();
-		}
-		else if (num == 4)
-		{
 			maze.compare_roadMap("Maze.txt");
 			system("cls");
-			printf("<Compare Stack & Queue> Start!!\n");
 			maze.compare();
 		}
 		else
