@@ -9,8 +9,9 @@
 using namespace std;
 
 class Maze
-{ 
+{
 	char** map = NULL;
+	char** buffer = NULL;
 	int width;
 	int height;
 
@@ -27,11 +28,19 @@ public:
 	Maze() { init(0, 0); }
 	~Maze() { reset(); }
 
+
 	void init(int w, int h) //map 이차원 배열을 동적으로 할당
 	{
 		map = new char* [h];
 		for (int i = 0; i < h; i++)
 			map[i] = new char[w];
+	}
+	
+	void bufferinit(int w, int h) //map 이차원 배열을 동적으로 할당
+	{
+		buffer = new char* [h];
+		for (int i = 0; i < h; i++)
+			buffer[i] = new char[w];
 	}
 
 	void reset() //미로 맵 maze를 동적으로 해제
@@ -70,64 +79,185 @@ public:
 		}
 		width = word / height;
 
-		//map 이차원배열 동적으로 할당
-		init(width, height);
+		//map 이차원배열 동적으로 할당 높이라 너비만 구한것 
+		init(width, height); 
+		bufferinit(width, height);
+
 
 		//map 이차원배열에 미로 삽입
 		for (int i = 0; i < height; i++)
 		{
 			for (int z = 0; z < width; z++)
 			{
-				fp >> c;
-				map[i][z] = c;
+				
 
-				//큐에 입구 위치 삽입
+				fp >> c;  
+				map[i][z] = c;   // 맵 삽입 
+
+				// 입구 위치 삽입
 				if (map[i][z] == 'e')
 				{
 					Location2D entry(i, z);
 					if (num == 1)
-						stack.push(new Node(i, z)); //스택 입구!
+						stack.push(new Node(i, z)); //스택 입구 위치 삽입
 					else if (num == 2 || num == 3)
-						queue.enqueue(new Node(i, z));
+						queue.enqueue(new Node(i, z)); //큐 입구 위치 삽입 
 					else if (num == 4)
 					{
 						stack.push(new Node(i, z));
 						queue.enqueue(new Node(i, z));
 					}
+
 				}
+
 			}
 		}
+		
 		fp.close();
 	}
 	// 파일로 맵 가져오기
-	
+
+
+	void stack_Search()	//DFS 깊이우선 탐색
+	{
+		int count = 0;
+		while (stack.isEmpty() == false) { //roadfile에서 스택에 값을 잘 넘겨 줬다면 
+			//printMap(); //map 보여주기 
+			
+			if (E_key() == 13) { // enter 누루면 
+
+				//system("cls");
+				Node* here = stack.peek();
+				stack.pop();
+
+
+				int r = here->row;
+				int c = here->col;
+				count++;
+
+				
+				
+				buffer_print(map[r][c]);
+
+				printf("현재위치: (%d,%d) ", r, c);
+
+				if (map[r][c] == 'x')
+				{
+					//system("cls");
+					printf("\n>>>탐색완료.>>> \n");
+					printf("=====[ 결과]=====\n");
+					printf("pop %d번 \n", count);
+
+
+					//printMap();
+
+					return;
+				}
+				else {
+					map[r][c] = '.';
+					if (isValidLoc(r - 1, c)) stack.push(new Node(r - 1, c));
+					if (isValidLoc(r + 1, c)) stack.push(new Node(r + 1, c));
+					if (isValidLoc(r, c - 1)) stack.push(new Node(r, c - 1));
+					if (isValidLoc(r, c + 1)) stack.push(new Node(r, c + 1));
+					
+				}
+			}
+		}
+		printf("미로 탐색 실패\n");
+	}
+
+
+
+
+	// gotoxy 함수 쓰기위해 덮어쓰기 함수 
+	void buffer_print(char c)
+	{
+		
+		
+		/* 현재 미로와 front_buffer(이전 미로)에 있는 미로 비교 */
+		for (int i = 0; i < height; ++i)
+			for (int j = 0, j2 = 0; j < width; ++j)
+			{
+				if (buffer[i][j] != map[i][j])
+				{
+					printMap(j2, i, map[i][j]);
+					// 바뀐 부분 화면에 출력
+					buffer[i][j] = map[i][j];
+					// 바뀐 부분은 출력 후 front_buffer에 저장
+				}
+				j2 += 2;
+				// 2byte(두칸)짜리로 출력하기 때문에 x 좌표는 2칸씩 이동시켜야함
+			
+			}
+				
+	}
+
+	void printMap(int j, int i, char c) {
+		
+
+		gotoxy( 45+ j,  5+ i);	// 한줄씩 시작지점을 아래로
+		switch (c)
+		{
+		case 48:
+			printf(" ");  //통로
+			break;
+		case 49:
+			printf("■");
+			break;
+		case 50:
+			printf("⊙");
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);
+			break;
+		case 51:
+			printf("▩");
+			break;
+		case 52:
+			printf("↘");
+			break;
+		case 53:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);
+			printf("★");
+			break;
+		}
+		gotoxy(10 + height, 5 + width);
+	}
+
+
+
+
 	//미로 화면에 출력
 	void printMap() {
 		printf("\n\n  [ Map ]\n\n");
+
+		
 		for (int i = 0; i < height; i++)
 		{
 			for (int z = 0; z < width; z++)
 			{
-				if (map[i][z] == '0') //길
-				{
-					cout << "  ";
-				}
-				else if (map[i][z] == '1') //벽
-				{
-					cout << "▣";
-				}
-				else if (map[i][z] == 'e') //입구
-				{
-					cout << "☞ ";
-				}
-				else if (map[i][z] == 'x') //출구
-				{
-					cout << "♨";
-				}
-				else if (map[i][z] == '.') //지나온 길
-				{
-					cout << "♪";
-				}
+				
+
+					if (map[i][z] == '0') //길
+					{
+						cout << "  ";
+					}
+					else if (map[i][z] == '1') //벽
+					{
+						cout << "■";
+					}
+					else if (map[i][z] == 'e') //입구
+					{
+						cout << "♡";
+					}
+					else if (map[i][z] == 'x') //출구
+					{
+						cout << "♨";
+					}
+					else if (map[i][z] == '.') //지나온 길
+					{
+
+						cout << "♪";
+					}
+				
 
 			}
 			cout << endl;
@@ -138,14 +268,14 @@ public:
 	int E_key()
 	{
 		int key;
-		key = _getch();
-		if (key == 13)
+		key = _getch(); //키입력 
+		if (key == 13)  /// enter == 13
 		{
 			return key;
 		}
-		else if (key == 224)
+		else if (key == 224)  
 		{
-			return _getch();
+			return _getch(); // 다시 반환값 얻기 
 		}
 		return 0;
 	}
@@ -198,7 +328,7 @@ public:
 	void queue_SearchExit()//BFS 너비우선탐색
 	{
 		int count = 0;
-		while (queue.isEmpty() == false) 
+		while (queue.isEmpty() == false)
 		{
 			printMap();
 			if (E_key() == 13)
@@ -213,12 +343,12 @@ public:
 
 				printf("현재위치: (%d,%d) \n", r, c);
 
-				if (map[r][c] == 'x') { 
+				if (map[r][c] == 'x') {
 					system("cls");
 					printf("\n>>>탐색완료.>>> \n");
 					printf("=====[ 결과]=====\n");
 					printf("dequeue %d번 \n", count);
-					
+
 					printMap();
 					return;
 				}
@@ -235,265 +365,239 @@ public:
 		printf("미로 탐색 실패\n");
 	}
 
-	
 
-	
-	void stack_Search()	//DFS 깊이우선 탐색
+
+
+
+
+	//=======================비교하기==========================================
+
+	void compare_init(int w, int h)
 	{
-		int count=0;
-		while (stack.isEmpty() == false) {	
-			printMap();
-			if (E_key() == 13) {
-				system("cls");
-				Node* here = stack.peek();
-				stack.pop();
+		stackMap = new char* [h];
+		queueMap = new char* [h];
+		for (int i = 0; i < h; i++)
+		{
+			stackMap[i] = new char[w];
+			queueMap[i] = new char[w];
+		}
+	}
 
-				int r = here->row;
-				int c = here->col;
-				count++;
-				printf("현재위치: (%d,%d) ", r, c);
+	void compare_reset()
+	{
+		for (int i = 0; i < height; i++)
+		{
+			delete[]stackMap[i];
+			delete[]queueMap[i];
+		}
+		delete[]stackMap;
+		delete[]queueMap;
+	}
 
-				if (map[r][c] == 'x')
+	bool stack_isValidLoc(int sr, int sc)
+	{
+		if (sr < 0 || sc < 0 || sr >= height || sc >= width) return false;
+		else return stackMap[sr][sc] == '0' || stackMap[sr][sc] == 'x';
+	}
+
+	bool queue_isValidLoc(int qr, int qc)
+	{
+		if (qr < 0 || qc < 0 || qr >= height || qc >= width) return false;
+		else return queueMap[qr][qc] == '0' || queueMap[qr][qc] == 'x';
+	}
+
+	void compare_roadMap(const char* filename)
+	{
+		char c;
+		ifstream fp(filename);
+		if (fp.fail())
+			printf("Error: 파일이 존재하지 않습니다.");
+
+		//미로 크기 계산
+		FILE* fd = fopen(filename, "r");
+		int word = 0;
+		height = 1;
+		width = 0;
+		while ((c = getc(fd)) != EOF) {
+			if (c == '\n') height++;
+			if (c == '0' || c == '1' || c == 'e' || c == 'x')
+			{
+				word++;
+			}
+		}
+		width = word / height;
+
+		compare_init(width, height);
+
+		for (int i = 0; i < height; i++)
+		{
+			for (int z = 0; z < width; z++)
+			{
+				fp >> c;
+				queueMap[i][z] = c;
+				stackMap[i][z] = c;
+
+				if (queueMap[i][z] == 'e') //입구 위치
 				{
-					system("cls");
-					printf("\n>>>탐색완료.>>> \n");
-					printf("=====[ 결과]=====\n");
-					printf("pop %d번 \n", count);
-					
-					
-					printMap();
-					return;
-				}
-				else {
-					map[r][c] = '.';
-					if (isValidLoc(r - 1, c)) stack.push(new Node(r - 1, c));
-					if (isValidLoc(r + 1, c)) stack.push(new Node(r + 1, c));
-					if (isValidLoc(r, c - 1)) stack.push(new Node(r, c - 1));
-					if (isValidLoc(r, c + 1)) stack.push(new Node(r, c + 1));
+					stack.push(new Node(i, z));
+					queue.enqueue(new Node(i, z));
 				}
 			}
+		}
+		fp.close();
+	}
+	void comparePrintMap() {
+		printf("\n\n  [ StackMap ]\n\n");
+		for (int i = 0; i < height; i++)
+		{
+			for (int z = 0; z < width; z++)
+			{
+				if (stackMap[i][z] == '0') //길
+				{
+					cout << "  ";
+				}
+				else if (stackMap[i][z] == '1') //벽
+				{
+					cout << "▣";
+				}
+				else if (stackMap[i][z] == 'e') //입구
+				{
+					cout << "☞";
+				}
+				else if (stackMap[i][z] == 'x') //출구
+				{
+					cout << "♨";
+				}
+				else if (stackMap[i][z] == '.') //지나온 길
+				{
+					cout << "♪";
+				}
+
+			}
+			cout << endl;
+		}
+		cout << endl;
+		printf("\n\n  [ QueueMap ]\n\n");
+		for (int i = 0; i < height; i++)
+		{
+			for (int z = 0; z < width; z++)
+			{
+				if (queueMap[i][z] == '0') //길
+				{
+					cout << "  ";
+				}
+				else if (queueMap[i][z] == '1') //벽
+				{
+					cout << "▣";
+				}
+				else if (queueMap[i][z] == 'e') //입구
+				{
+					cout << "☞";
+				}
+				else if (queueMap[i][z] == 'x') //출구
+				{
+					cout << "♨ ";
+				}
+				else if (queueMap[i][z] == '.') //지나온 길
+				{
+					cout << "♪";
+				}
+
+			}
+			cout << endl;
+		}
+		cout << endl;
+	}
+	void compare()
+	{
+		int stackCount = 0;
+		int queueCount = 0;
+		while (1)
+		{
+			comparePrintMap();
+			Sleep(100);
+			//system("cls");
+
+			if (queue.isEmpty() == true && stack.isEmpty() == true)
+			{
+				printf("\n>>>탐색완료.>>> \n");
+				printf("=====[ 결과]=====\n");
+				printf("POP %d회, DEQUEUE %d회 \n", stackCount, queueCount);
+				if (stackCount > queueCount)
+					printf("BFS가 더 빠릅니다.\n");
+				else if (stackCount < queueCount)
+					printf("DFS가 더 빠릅니다.\n");
+				else if (stackCount == queueCount)
+					printf("DFS와 BFS가 동시에 도착했습니다.\n");
+
+
+				return;
+			}
+
+			if (stack.isEmpty() == false)
+			{
+				Node* hereStack = stack.peek();
+				stack.pop();
+				int sr = hereStack->row;
+				int sc = hereStack->col;
+				stackCount++;
+
+
+				if (stackMap[sr][sc] == 'x')
+				{
+					while (stack.isEmpty() == false)
+						stack.pop();
+				}
+				else if (stackMap[sr][sc] != '.')
+				{
+					stackMap[sr][sc] = '.';
+					if (stack_isValidLoc(sr - 1, sc)) stack.push(new Node(sr - 1, sc));
+					if (stack_isValidLoc(sr + 1, sc)) stack.push(new Node(sr + 1, sc));
+					if (stack_isValidLoc(sr, sc - 1)) stack.push(new Node(sr, sc - 1));
+					if (stack_isValidLoc(sr, sc + 1)) stack.push(new Node(sr, sc + 1));
+				}
+			}
+			if (queue.isEmpty() == false)
+			{
+				Location2D* hereQueue = queue.peek();
+				queue.dequeue();
+				int qr = hereQueue->row;
+				int qc = hereQueue->col;
+				queueCount++;
+
+
+				if (queueMap[qr][qc] == 'x')
+				{
+					while (queue.isEmpty() == false)
+						queue.dequeue();
+				}
+				else if (queueMap[qr][qc] != '.')
+				{
+					queueMap[qr][qc] = '.';
+					if (queue_isValidLoc(qr - 1, qc)) queue.enqueue(new Node(qr - 1, qc));
+					if (queue_isValidLoc(qr + 1, qc)) queue.enqueue(new Node(qr + 1, qc));
+					if (queue_isValidLoc(qr, qc - 1)) queue.enqueue(new Node(qr, qc - 1));
+					if (queue_isValidLoc(qr, qc + 1)) queue.enqueue(new Node(qr, qc + 1));
+				}
+			}
+
 		}
 		printf("미로 탐색 실패\n");
 	}
 
-//=======================비교하기==========================================
 
-void compare_init(int w, int h)
-{
-	stackMap = new char* [h];
-	queueMap = new char* [h];
-	for (int i = 0; i < h; i++)
+	/* 콘솔 출력 좌표 설정 */
+/* parameter : x축, y축 */
+/* return : void */
+	void gotoxy(int x, int y)
 	{
-		stackMap[i] = new char[w];
-		queueMap[i] = new char[w];
+		COORD pos = { x,y };
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 	}
-}
-
-void compare_reset()
-{
-	for (int i = 0; i < height; i++)
-	{
-		delete[]stackMap[i];
-		delete[]queueMap[i];
-	}
-	delete[]stackMap;
-	delete[]queueMap;
-}
-
-bool stack_isValidLoc(int sr, int sc)
-{
-	if (sr < 0 || sc < 0 || sr >= height || sc >= width) return false;
-	else return stackMap[sr][sc] == '0' || stackMap[sr][sc] == 'x';
-}
-
-bool queue_isValidLoc(int qr, int qc)
-{
-	if (qr < 0 || qc < 0 || qr >= height || qc >= width) return false;
-	else return queueMap[qr][qc] == '0' || queueMap[qr][qc] == 'x';
-}
-
-void compare_roadMap(const char* filename)
-{
-	char c;
-	ifstream fp(filename);
-	if (fp.fail())
-		printf("Error: 파일이 존재하지 않습니다.");
-
-	//미로 크기 계산
-	FILE* fd = fopen(filename, "r");
-	int word = 0;
-	height = 1;
-	width = 0;
-	while ((c = getc(fd)) != EOF) {
-		if (c == '\n') height++;
-		if (c == '0' || c == '1' || c == 'e' || c == 'x')
-		{
-			word++;
-		}
-	}
-	width = word / height;
-
-	compare_init(width, height);
-
-	for (int i = 0; i < height; i++)
-	{
-		for (int z = 0; z < width; z++)
-		{
-			fp >> c;
-			queueMap[i][z] = c;
-			stackMap[i][z] = c;
-
-			if (queueMap[i][z] == 'e') //입구 위치
-			{
-				stack.push(new Node(i, z));
-				queue.enqueue(new Node(i, z));
-			}
-		}
-	}
-	fp.close();
-}
-void comparePrintMap() {
-	printf("\n\n  [ StackMap ]\n\n");
-	for (int i = 0; i < height; i++)
-	{
-		for (int z = 0; z < width; z++)
-		{
-			if (stackMap[i][z] == '0') //길
-			{
-				cout << "  ";
-			}
-			else if (stackMap[i][z] == '1') //벽
-			{
-				cout << "▣";
-			}
-			else if (stackMap[i][z] == 'e') //입구
-			{
-				cout << "☞";
-			}
-			else if (stackMap[i][z] == 'x') //출구
-			{
-				cout << "♨";
-			}
-			else if (stackMap[i][z] == '.') //지나온 길
-			{
-				cout << "♪";
-			}
-
-		}
-		cout << endl;
-	}
-	cout << endl;
-	printf("\n\n  [ QueueMap ]\n\n");
-	for (int i = 0; i < height; i++)
-	{
-		for (int z = 0; z < width; z++)
-		{
-			if (queueMap[i][z] == '0') //길
-			{
-				cout << "  ";
-			}
-			else if (queueMap[i][z] == '1') //벽
-			{
-				cout << "▣";
-			}
-			else if (queueMap[i][z] == 'e') //입구
-			{
-				cout << "☞";
-			}
-			else if (queueMap[i][z] == 'x') //출구
-			{
-				cout << "♨ ";
-			}
-			else if (queueMap[i][z] == '.') //지나온 길
-			{
-				cout << "♪";
-			}
-
-		}
-		cout << endl;
-	}
-	cout << endl;
-}
-void compare()
-{
-	int stackCount = 0;
-	int queueCount = 0;
-	while (1)
-	{
-		comparePrintMap();
-		Sleep(100);
-		//system("cls");
-
-		if (queue.isEmpty() == true && stack.isEmpty() == true)
-		{
-			printf("\n>>>탐색완료.>>> \n");
-			printf("=====[ 결과]=====\n");
-			printf("POP %d회, DEQUEUE %d회 \n", stackCount, queueCount);
-			if (stackCount > queueCount)
-				printf("BFS가 더 빠릅니다.\n");
-			else if (stackCount < queueCount)
-				printf("DFS가 더 빠릅니다.\n");
-			else if (stackCount == queueCount)
-				printf("DFS와 BFS가 동시에 도착했습니다.\n");
-
-
-			return;
-		}
-
-		if (stack.isEmpty() == false)
-		{
-			Node* hereStack = stack.peek();
-			stack.pop();
-			int sr = hereStack->row;
-			int sc = hereStack->col;
-			stackCount++;
-
-
-			if (stackMap[sr][sc] == 'x')
-			{
-				while (stack.isEmpty() == false)
-					stack.pop();
-			}
-			else if (stackMap[sr][sc] != '.')
-			{
-				stackMap[sr][sc] = '.';
-				if (stack_isValidLoc(sr - 1, sc)) stack.push(new Node(sr - 1, sc));
-				if (stack_isValidLoc(sr + 1, sc)) stack.push(new Node(sr + 1, sc));
-				if (stack_isValidLoc(sr, sc - 1)) stack.push(new Node(sr, sc - 1));
-				if (stack_isValidLoc(sr, sc + 1)) stack.push(new Node(sr, sc + 1));
-			}
-		}
-		if (queue.isEmpty() == false)
-		{
-			Location2D* hereQueue = queue.peek();
-			queue.dequeue();
-			int qr = hereQueue->row;
-			int qc = hereQueue->col;
-			queueCount++;
-
-
-			if (queueMap[qr][qc] == 'x')
-			{
-				while (queue.isEmpty() == false)
-					queue.dequeue();
-			}
-			else if (queueMap[qr][qc] != '.')
-			{
-				queueMap[qr][qc] = '.';
-				if (queue_isValidLoc(qr - 1, qc)) queue.enqueue(new Node(qr - 1, qc));
-				if (queue_isValidLoc(qr + 1, qc)) queue.enqueue(new Node(qr + 1, qc));
-				if (queue_isValidLoc(qr, qc - 1)) queue.enqueue(new Node(qr, qc - 1));
-				if (queue_isValidLoc(qr, qc + 1)) queue.enqueue(new Node(qr, qc + 1));
-			}
-		}
-
-	}
-	printf("미로 탐색 실패\n");
 
 
 
 
-}
 
 
 

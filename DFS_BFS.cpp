@@ -13,6 +13,7 @@ void main()
 		printf("2. BFS방식  미로찾기 \n");
 		printf("3. DFS, BFS 비교하기 \n");
 		printf("=========== 그 외 번호는 종료=================\n");
+		printf("\n");
 
 		printf("번호 입력: ");
 		scanf("%d", &num);
@@ -20,7 +21,7 @@ void main()
 
 		if (num == 1)
 		{
-			system("cls");
+			//system("cls");
 			maze.stack_Search();
 			maze.printDFS();
 			printf("\n");
