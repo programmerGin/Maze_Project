@@ -13,7 +13,7 @@ public:
 	bool isEmpty() { return front == NULL; }
 
 	void enqueue(Node* p) {
-		if (isEmpty())front = rear = p;
+		if (isEmpty())front = rear = p;//처음 p 는 rear
 		else {
 			rear->setLink(p);
 			rear = p;
@@ -53,7 +53,7 @@ public:
 	}
 	Node* pop() {
 		if (isEmpty()) return NULL;
-		Node* p = top;
+		Node* p = top;//처음 p 는 top
 		top = top->getLink();
 		return p;
 	}

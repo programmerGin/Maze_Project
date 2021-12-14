@@ -13,12 +13,10 @@ class Maze
 	char** map = NULL;
 	int width;
 	int height;
-
-	//비교를 위한 맵
 	char** stackMap = NULL;
 	char** queueMap = NULL;
 
-	//위치 큐,스택 객체 생성
+
 	LinkedQueue queue;
 	LinkedStack stack;
 
@@ -27,14 +25,14 @@ public:
 	Maze() { init(0, 0); }
 	~Maze() { reset(); }
 
-	void init(int w, int h) //map 이차원 배열을 동적으로 할당
+	void init(int w, int h) 
 	{
 		map = new char* [h];
 		for (int i = 0; i < h; i++)
 			map[i] = new char[w];
 	}
 
-	void reset() //미로 맵 maze를 동적으로 해제
+	void reset()
 	{
 		for (int i = 0; i < height; i++)
 			delete[]map[i];
@@ -42,7 +40,7 @@ public:
 	}
 
 	bool isValidLoc(int r, int c)
-	{
+	{//r,c가 0보다 작거나 height, width보다 값이 크면 false
 		if (r < 0 || c < 0 || r >= height || c >= width) return false;
 		else return map[r][c] == '0' || map[r][c] == 'x';
 	}
@@ -56,7 +54,6 @@ public:
 		if (fp.fail())
 			printf("Error: 파일이 존재하지 않습니다.");
 
-		//미로 크기 계산
 		FILE* fd = fopen(filename, "r");
 		int word = 0;
 		height = 1;
@@ -69,11 +66,8 @@ public:
 			}
 		}
 		width = word / height;
-
-		//map 이차원배열 동적으로 할당
 		init(width, height);
 
-		//map 이차원배열에 미로 삽입
 		for (int i = 0; i < height; i++)
 		{
 			for (int z = 0; z < width; z++)
@@ -81,12 +75,12 @@ public:
 				fp >> c;
 				map[i][z] = c;
 
-				//큐에 입구 위치 삽입
-				if (map[i][z] == 'e')
-				{
+				
+				if (map[i][z] == 'e')//e는 시작
+				{//entry 입구
 					Location2D entry(i, z);
 					if (num == 1)
-						stack.push(new Node(i, z)); //스택 입구!
+						stack.push(new Node(i, z)); //입구 push
 					else if (num == 2 || num == 3)
 						queue.enqueue(new Node(i, z));
 					else if (num == 4)
@@ -99,7 +93,7 @@ public:
 		}
 		fp.close();
 	}
-	// 파일로 맵 가져오기
+	// ==================파일로 맵 가져오기=============================================
 	
 	//미로 화면에 출력
 	void printMap() {
@@ -108,7 +102,7 @@ public:
 		{
 			for (int z = 0; z < width; z++)
 			{
-				if (map[i][z] == '0') //길
+				if (map[i][z] == '0') //미로
 				{
 					cout << "  ";
 				}
@@ -124,7 +118,7 @@ public:
 				{
 					cout << "♨";
 				}
-				else if (map[i][z] == '.') //지나온 길
+				else if (map[i][z] == '.') //방문했던곳
 				{
 					cout << "♪";
 				}
@@ -205,8 +199,8 @@ public:
 			{
 				system("cls");
 
-				Location2D* here = queue.peek(); //큐의 상단 front 객체 복사
-				queue.dequeue(); //큐 상단 객체 삭제
+				Location2D* here = queue.peek(); 
+				queue.dequeue(); 
 				count++;
 				int r = here->row;
 				int c = here->col;
@@ -358,7 +352,7 @@ void comparePrintMap() {
 	{
 		for (int z = 0; z < width; z++)
 		{
-			if (stackMap[i][z] == '0') //길
+			if (stackMap[i][z] == '0') //미로
 			{
 				cout << "  ";
 			}
@@ -374,7 +368,7 @@ void comparePrintMap() {
 			{
 				cout << "♨";
 			}
-			else if (stackMap[i][z] == '.') //지나온 길
+			else if (stackMap[i][z] == '.') //방문했던 곳
 			{
 				cout << "♪";
 			}
@@ -388,7 +382,7 @@ void comparePrintMap() {
 	{
 		for (int z = 0; z < width; z++)
 		{
-			if (queueMap[i][z] == '0') //길
+			if (queueMap[i][z] == '0') //미로
 			{
 				cout << "  ";
 			}
@@ -404,7 +398,7 @@ void comparePrintMap() {
 			{
 				cout << "♨ ";
 			}
-			else if (queueMap[i][z] == '.') //지나온 길
+			else if (queueMap[i][z] == '.') //방문했던곳
 			{
 				cout << "♪";
 			}
@@ -421,8 +415,7 @@ void compare()
 	while (1)
 	{
 		comparePrintMap();
-		Sleep(100);
-		//system("cls");
+		Sleep(100);//속도
 
 		if (queue.isEmpty() == true && stack.isEmpty() == true)
 		{
@@ -442,12 +435,11 @@ void compare()
 
 		if (stack.isEmpty() == false)
 		{
-			Node* hereStack = stack.peek();
+			Location2D* hereStack = stack.peek();
 			stack.pop();
 			int sr = hereStack->row;
 			int sc = hereStack->col;
 			stackCount++;
-
 
 			if (stackMap[sr][sc] == 'x')
 			{
